@@ -46,11 +46,11 @@ export default function Home() {
               <div className="inline-block">
                 <span className="text-gold font-semibold text-sm tracking-widest">PROFESSIONAL PHOTOGRAPHY</span>
               </div>
-              <h1 className="text-3xl md:text-6xl font-bold text-navy-900 leading-tight">
+              <h1 className="text-3xl md:text-5xl font-bold text-navy-900 leading-tight">
                 Capturing Moments,
                 <span className="text-gold"> Creating Memories</span>
               </h1>
-              <p className="text-sm text-gray-600 leading-relaxed max-w-lg">
+              <p className="text-sm md:text-lg text-gray-600 leading-relaxed max-w-lg">
                 Experienced photographer specializing in portraits, events, and commercial photography. Every shot tells a story with artistic excellence and professional precision.
               </p>
               <div className="flex gap-4 pt-4">
