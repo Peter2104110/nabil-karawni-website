@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Mail, Phone, Instagram, ArrowRight, MapPin } from "lucide-react";
 import { useState } from "react";
 import CircularGallery from "@/components/ui/CircularGallery";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 /**
  * Design Philosophy: Modern Elegance with Depth
@@ -35,17 +36,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white text-navy-900">
-      
-
+  
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 bg-linear-to-br from-white via-white to-gray-50 relative overflow-hidden">
+      <section className="pt-40 pb-20 px-4 bg-linear-to-br from-white via-white to-gray-50 relative overflow-hidden">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+          <div className="flex flex-col md:flex-row gap-12 items-center">
             {/* Left: Text */}
-            <div className="space-y-6 animate-fade-in">
-              <div className="inline-block">
-                <span className="text-gold font-semibold text-sm tracking-widest">PROFESSIONAL PHOTOGRAPHY</span>
-              </div>
+
+            {/*}
+            <div className="inline-block">
+              <span className="text-gold font-semibold text-sm tracking-widest">PROFESSIONAL PHOTOGRAPHY</span>
+            </div> */}
+
+            <div className="gap-8 flex flex-col">
               <h1 className="text-3xl md:text-5xl font-bold text-navy-900 leading-tight">
                 Capturing Moments,
                 <span className="text-gold"> Creating Memories</span>
@@ -71,6 +75,7 @@ export default function Home() {
               />
               <div className="absolute inset-0 bg-linear-to-t from-navy-900/20 to-transparent"></div>
             </div>
+
           </div>
         </div>
 
@@ -81,32 +86,35 @@ export default function Home() {
       {/* Portfolio Section */}
       <section id="portfolio" className="py-20 bg-primary overflow-hidden">
 
-        <div className="container mx-auto px-4 text-center mb-16">
+        <ScrollReveal className="container mx-auto px-4 text-center mb-16">
           <span className="text-gold font-semibold text-sm tracking-widest">PORTFOLIO</span>
           <h2 className="text-3xl md:text-5xl font-bold text-white mt-4">Featured Work</h2>
           <p className="text-gray-300 mt-4 max-w-2xl mx-auto text-sm md:text-lg">
             Explore a selection of my finest photography work across different genres and styles.
           </p>
-        </div>
+        </ScrollReveal>
 
-        <div className="h-80 w-full relative">
+        <ScrollReveal className="h-80 w-full relative">
           <CircularGallery bend={0.1} textColor="#ffffff" borderRadius={0.05} scrollEase={0.1} scrollSpeed={2}/>
-        </div>
+        </ScrollReveal>
 
       </section> 
 
+
       {/* Services Section */}
       <section id="services" className="py-20 px-4 bg-white">
+
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
+
+          <ScrollReveal className="text-center mb-16">
             <span className="text-gold font-semibold text-sm tracking-widest">SERVICES</span>
             <h2 className="text-3xl md:text-5xl font-bold text-navy-900 mt-4">What We Offer</h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-sm md:text-lg">
               Comprehensive photography services tailored to your needs with professional expertise and artistic vision.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <ScrollReveal className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {services.map((service, index) => (
               <div
                 key={index}
@@ -121,7 +129,7 @@ export default function Home() {
                 <p className="text-gray-600 leading-relaxed">{service.description}</p>
               </div>
             ))}
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -129,7 +137,8 @@ export default function Home() {
       <section id="about" className="py-20 px-4 bg-primary">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6 text-white">
+
+            <ScrollReveal className="space-y-6 text-white">
               <span className="text-gold font-semibold text-sm tracking-widest">ABOUT ME</span>
               <h2 className="text-3xl md:text-5xl font-bold">Nabil Karawni</h2>
               <p className="text-gray-300 leading-relaxed text-sm md:text-lg">
@@ -148,11 +157,12 @@ export default function Home() {
                   <span className="text-gray-300 text-sm">Expert Post-Processing</span>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
 
             <div className="relative">
               <div className="bg-linear-to-br from-gold/20 to-transparent p-8 rounded-lg">
-                <div className="space-y-6">
+
+                <ScrollReveal className="space-y-6">
                   <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-gold/30">
                     <div className="text-4xl font-bold text-gold mb-2">30+</div>
                     <p className="text-gray-300">Years of Experience</p>
@@ -165,7 +175,8 @@ export default function Home() {
                     <div className="text-4xl font-bold text-gold mb-2">1000+</div>
                     <p className="text-gray-300">Projects Completed</p>
                   </div>
-                </div>
+                </ScrollReveal>
+
               </div>
             </div>
           </div>
@@ -175,15 +186,16 @@ export default function Home() {
       {/* Contact Section */}
       <section id="contact" className="py-20 px-4 bg-white">
         <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-12">
+
+          <ScrollReveal className="text-center mb-12">
             <span className="text-gold font-semibold text-sm tracking-widest">GET IN TOUCH</span>
             <h2 className="text-3xl md:text-5xl font-bold text-navy-900 mt-4">Let's Create Something Beautiful</h2>
             <p className="text-gray-600 mt-4 text-sm md:text-lg">
               Ready to book your session or discuss your photography needs? We'd love to hear from you.
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <ScrollReveal className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
 
             <div className="text-center p-6 rounded-lg bg-gray-50 hover:bg-gold/5 transition-colors duration-300 shadow-lg">
               <a href="https://wa.me/03888703" target="_blank" rel="noopener noreferrer">
@@ -209,7 +221,7 @@ export default function Home() {
               </a>
             </div>
 
-          </div>
+          </ScrollReveal>
 
           {/* Contact Form 
           <div className="bg-navy-900 rounded-lg p-8 md:p-12">

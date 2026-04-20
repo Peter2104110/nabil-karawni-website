@@ -261,7 +261,11 @@ html{
   }
 
   .animate-fade-in {
-    animation: fadeIn 0.6s ease-in-out;
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .opacity-0 {
+    opacity: 0;
   }
 
   /* Hover lift effect */

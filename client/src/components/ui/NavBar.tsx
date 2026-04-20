@@ -3,7 +3,7 @@ import { SidebarTrigger } from "./sidebar";
 
 export default function NavBar() {
   return (
-    <nav className="fixed top-0 w-full bg-[#283345] z-50 border-b border-gray-200 h-30">
+    <nav className="fixed top-0 w-full bg-[#283345] z-50 border-b-3 border-gold h-30">
 
       <div className="container m-auto h-full px-4 py-4 flex md:justify-between items-center">
 
