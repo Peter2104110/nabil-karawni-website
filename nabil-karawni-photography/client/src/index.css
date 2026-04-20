@@ -1,0 +1,276 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+html{
+  scroll-behavior: smooth;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  /* Navy, Gold, White Theme */
+  --primary: #283345;
+  --primary-foreground: #FFFFFF;
+  --sidebar-primary: #0F2B4D;
+  --sidebar-primary-foreground: #FFFFFF;
+  --chart-1: rgb(212, 165, 116);
+  --chart-2: #0F2B4D;
+  --chart-3: #1A3A52;
+  --chart-4: #0F2B4D;
+  --chart-5: #051829;
+  --radius: 0.65rem;
+  --background: #FFFFFF;
+  --foreground: #0F2B4D;
+  --card: #FFFFFF;
+  --card-foreground: #0F2B4D;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F2B4D;
+  --secondary: #0F2B4D;
+  --secondary-foreground: #FFFFFF;
+  --muted: #E8E8E8;
+  --muted-foreground: #666666;
+  --accent: #D4A574;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #E5E5E5;
+  --input: #F5F5F5;
+  --ring: #D4A574;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0F2B4D;
+  --sidebar-accent: #D4A574;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #E5E5E5;
+  --sidebar-ring: #D4A574;
+}
+
+.dark {
+  /* Dark mode: Navy background with light text */
+  --primary: #0F2B4D;
+  --primary-foreground: #FFFFFF;
+  --sidebar-primary: #0F2B4D;
+  --sidebar-primary-foreground: #FFFFFF;
+  --background: #051829;
+  --foreground: #FFFFFF;
+  --card: #0F2B4D;
+  --card-foreground: #FFFFFF;
+  --popover: #0F2B4D;
+  --popover-foreground: #FFFFFF;
+  --secondary: #1A3A52;
+  --secondary-foreground: #FFFFFF;
+  --muted: #1A3A52;
+  --muted-foreground: #B0B0B0;
+  --accent: #D4A574;
+  --accent-foreground: #051829;
+  --destructive: #FF6B6B;
+  --destructive-foreground: #FFFFFF;
+  --border: #1A3A52;
+  --input: #0F2B4D;
+  --ring: #D4A574;
+  --chart-1: #D4A574;
+  --chart-2: #0F2B4D;
+  --chart-3: #1A3A52;
+  --chart-4: #2A5A7A;
+  --chart-5: #051829;
+  --sidebar: #0F2B4D;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-accent: #D4A574;
+  --sidebar-accent-foreground: #051829;
+  --sidebar-border: #1A3A52;
+  --sidebar-ring: #D4A574;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Poppins', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+  }
+  h1 {
+    @apply text-4xl md:text-5xl;
+  }
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+  p {
+    font-family: 'Poppins', sans-serif;
+    @apply text-base leading-relaxed;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /**
+   * Custom container utility that centers content and adds responsive padding.
+   *
+   * This overrides Tailwind's default container behavior to:
+   * - Auto-center content (mx-auto)
+   * - Add responsive horizontal padding
+   * - Set max-width for large screens
+   *
+   * Usage: <div className="container">...</div>
+   *
+   * For custom widths, use max-w-* utilities directly:
+   * <div className="max-w-6xl mx-auto px-4">...</div>
+   */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* 16px - mobile padding */
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem; /* 32px - desktop padding */
+      padding-right: 2rem;
+      max-width: 1280px; /* Standard content width */
+    }
+  }
+
+  /* Custom color utilities for Navy, Gold, White theme */
+  .text-navy-900 {
+    @apply text-[#0F2B4D];
+  }
+
+  .bg-navy-900 {
+    @apply bg-[#0F2B4D];
+  }
+
+  .hover\:bg-navy-900:hover {
+    @apply bg-[#0F2B4D];
+  }
+
+  .hover\:bg-navy-800:hover {
+    @apply bg-[#051829];
+  }
+
+  .border-navy-900 {
+    @apply border-[#0F2B4D];
+  }
+
+  .text-gold {
+    @apply text-[#D4A574];
+  }
+
+  .bg-gold {
+    @apply bg-[#D4A574];
+  }
+
+  .hover\:bg-gold:hover {
+    @apply bg-[#D4A574];
+  }
+
+  .hover\:bg-gold\/90:hover {
+    @apply bg-[#D4A574]/90;
+  }
+
+  .border-gold {
+    @apply border-[#D4A574];
+  }
+
+  .hover\:border-gold:hover {
+    @apply border-[#D4A574];
+  }
+
+  .hover\:text-gold:hover {
+    @apply text-[#D4A574];
+  }
+
+  /* Animation utilities */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    transition: all 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+}
