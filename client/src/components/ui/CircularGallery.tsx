@@ -55,7 +55,11 @@ function createTextTexture(
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.fillText(text, canvas.width / 2, canvas.height / 2);
 
-  const texture = new Texture(gl, { generateMipmaps: false });
+  const texture = new Texture(gl, {
+    generateMipmaps: false,
+    minFilter: gl.LINEAR,
+    magFilter: gl.LINEAR
+  });
   texture.image = canvas;
   return { texture, width: canvas.width, height: canvas.height };
 }
@@ -221,7 +225,9 @@ class Media {
 
   createShader() {
     const texture = new Texture(this.gl, {
-      generateMipmaps: true
+      generateMipmaps: false,
+      minFilter: this.gl.LINEAR,
+      magFilter: this.gl.LINEAR
     });
     this.program = new Program(this.gl, {
       depthTest: false,
