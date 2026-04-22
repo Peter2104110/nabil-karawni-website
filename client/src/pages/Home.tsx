@@ -69,7 +69,7 @@ export default function Home() {
             {/* Right: Hero Image */}
             <div className="relative h-96 md:h-full min-h-96 rounded-lg overflow-hidden shadow-2xl">
               <img
-                src= "/DisplayPhotos/1.jpeg"  //"https://d2xsxph8kpxj0f.cloudfront.net/310519663404165549/g2PERz93dS2dzhGYUi7bTo/hero-bg-WWz3JyB88vZPmtXsZT3cLU.webp"
+                src= "/DisplayPhotos/1.webp"  //"https://d2xsxph8kpxj0f.cloudfront.net/310519663404165549/g2PERz93dS2dzhGYUi7bTo/hero-bg-WWz3JyB88vZPmtXsZT3cLU.webp"
                 alt="Hero Background"
                 className="w-full h-full object-right object-cover"
               />
@@ -198,7 +198,7 @@ export default function Home() {
           <ScrollReveal className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
 
             <div className="text-center p-6 rounded-lg bg-gray-50 hover:bg-gold/5 transition-colors duration-300 shadow-lg">
-              <a href="https://wa.me/03888703" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/96103888703" target="_blank" rel="noopener noreferrer">
                 <Phone className="w-8 h-8 text-gold mx-auto mb-4" />
                 <h3 className="font-bold text-navy-900 mb-2">Phone</h3>
                 <p className="text-gray-600">+961 03 888 703<br />Click to Contact on WhatsApp</p>

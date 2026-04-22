@@ -7,7 +7,7 @@ export default function NavBar() {
 
       <div className="container m-auto h-full px-4 py-4 flex md:justify-between items-center">
 
-        <div className="md:hidden">
+        <div className="md:hidden" id="triggerSideBarBtn">
           <SidebarTrigger className="h-auto w-12 hover:bg-transparent" style={{boxSizing:"border-box", padding: ".5rem"}}>
               <img src="/sidebar.png" className="w-full h-auto"></img>
           </SidebarTrigger>
