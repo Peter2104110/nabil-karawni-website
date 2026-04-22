@@ -1,5 +1,8 @@
-import { Camera, Mesh, Plane, Program, Renderer, Texture, Transform } from 'ogl';
-import { useEffect, useRef } from 'react';
+import { Camera, Mesh, Plane, Program, Renderer, Texture, Transform, Raycast } from 'ogl';
+import { useEffect, useRef, useState } from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+
+import imgsData from './GallaryImages.json'
 
 type GL = Renderer['gl'];
 
@@ -157,6 +160,7 @@ interface MediaProps {
   textColor: string;
   borderRadius?: number;
   font?: string;
+  app: App;
 }
 
 class Media {
@@ -186,6 +190,7 @@ class Media {
   speed: number = 0;
   isBefore: boolean = false;
   isAfter: boolean = false;
+  app: App;
 
   constructor({
     geometry,
@@ -201,7 +206,8 @@ class Media {
     bend,
     textColor,
     borderRadius = 0,
-    font
+    font,
+    app
   }: MediaProps) {
     this.geometry = geometry;
     this.gl = gl;
@@ -217,18 +223,41 @@ class Media {
     this.textColor = textColor;
     this.borderRadius = borderRadius;
     this.font = font;
+    this.app = app;
     this.createShader();
     this.createMesh();
-    this.createTitle();
+    //this.createTitle();
     this.onResize();
   }
 
   createShader() {
-    const texture = new Texture(this.gl, {
-      generateMipmaps: false,
-      minFilter: this.gl.LINEAR,
-      magFilter: this.gl.LINEAR
-    });
+    // Optimization: Shared texture cache to prevent duplicate RAM/VRAM usage for infinite scroll
+    let textureEntry = this.app.textureCache.get(this.image);
+    
+    if (!textureEntry) {
+      const texture = new Texture(this.gl, {
+        generateMipmaps: false,
+        minFilter: this.gl.LINEAR,
+        magFilter: this.gl.LINEAR
+      });
+      textureEntry = { texture, width: 0, height: 0, loaded: false };
+      this.app.textureCache.set(this.image, textureEntry);
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = this.image;
+      img.onload = () => {
+        texture.image = img;
+        if (textureEntry) {
+          textureEntry.width = img.naturalWidth;
+          textureEntry.height = img.naturalHeight;
+          textureEntry.loaded = true;
+        }
+        // Image object can be released from memory after upload
+        img.onload = null;
+      };
+    }
+
     this.program = new Program(this.gl, {
       depthTest: false,
       depthWrite: false,
@@ -282,22 +311,15 @@ class Media {
         }
       `,
       uniforms: {
-        tMap: { value: texture },
+        tMap: { value: textureEntry.texture },
         uPlaneSizes: { value: [0, 0] },
-        uImageSizes: { value: [0, 0] },
+        uImageSizes: { value: [textureEntry.width, textureEntry.height] },
         uSpeed: { value: 0 },
         uTime: { value: 100 * Math.random() },
         uBorderRadius: { value: this.borderRadius }
       },
       transparent: true
     });
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = this.image;
-    img.onload = () => {
-      texture.image = img;
-      this.program.uniforms.uImageSizes.value = [img.naturalWidth, img.naturalHeight];
-    };
   }
 
   createMesh() {
@@ -306,17 +328,6 @@ class Media {
       program: this.program
     });
     this.plane.setParent(this.scene);
-  }
-
-  createTitle() {
-    this.title = new Title({
-      gl: this.gl,
-      plane: this.plane,
-      renderer: this.renderer,
-      text: this.text,
-      textColor: this.textColor,
-      font: this.font
-    });
   }
 
   update(scroll: { current: number; last: number }, direction: 'right' | 'left') {
@@ -346,6 +357,14 @@ class Media {
     this.speed = scroll.current - scroll.last;
     this.program.uniforms.uTime.value += 0.04;
     this.program.uniforms.uSpeed.value = this.speed;
+
+    // Check if shared texture natural sizes are now known
+    if (this.program.uniforms.uImageSizes.value[0] === 0) {
+      const entry = this.app.textureCache.get(this.image);
+      if (entry && entry.loaded) {
+        this.program.uniforms.uImageSizes.value = [entry.width, entry.height];
+      }
+    }
 
     const planeOffset = this.plane.scale.x / 2;
     const viewportOffset = this.viewport.width / 2;
@@ -388,6 +407,7 @@ interface AppConfig {
   font?: string;
   scrollSpeed?: number;
   scrollEase?: number;
+  onSelect?: (item: { image: string; text: string }) => void;
 }
 
 class App {
@@ -411,15 +431,25 @@ class App {
   screen!: { width: number; height: number };
   viewport!: { width: number; height: number };
   raf: number = 0;
+  raycast!: Raycast;
+  onSelect?: (item: { image: string; text: string }) => void;
+
+  textureCache: Map<string, {
+    texture: Texture,
+    width: number,
+    height: number,
+    loaded: boolean
+  }> = new Map();
 
   boundOnResize!: () => void;
   boundOnWheel!: (e: Event) => void;
   boundOnTouchDown!: (e: MouseEvent | TouchEvent) => void;
   boundOnTouchMove!: (e: MouseEvent | TouchEvent) => void;
-  boundOnTouchUp!: () => void;
+  boundOnTouchUp!: (e: MouseEvent | TouchEvent) => void;
 
   isDown: boolean = false;
   start: number = 0;
+  clickStart: { x: number; y: number } = { x: 0, y: 0 };
 
   constructor(
     container: HTMLElement,
@@ -430,17 +460,20 @@ class App {
       borderRadius = 0,
       font = 'bold 30px Figtree',
       scrollSpeed = 2,
-      scrollEase = 0.05
+      scrollEase = 0.05,
+      onSelect
     }: AppConfig
   ) {
     document.documentElement.classList.remove('no-js');
     this.container = container;
     this.scrollSpeed = scrollSpeed;
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
+    this.onSelect = onSelect;
     this.onCheckDebounce = debounce(this.onCheck.bind(this), 200);
     this.createRenderer();
     this.createCamera();
     this.createScene();
+    this.createRaycast();
     this.onResize();
     this.createGeometry();
     this.createMedias(items, bend, textColor, borderRadius, font);
@@ -469,10 +502,14 @@ class App {
     this.scene = new Transform();
   }
 
+  createRaycast() {
+    this.raycast = new Raycast();
+  }
+
   createGeometry() {
     this.planeGeometry = new Plane(this.gl, {
-      heightSegments: 50,
-      widthSegments: 100
+      heightSegments: 20,
+      widthSegments: 20
     });
   }
 
@@ -483,57 +520,9 @@ class App {
     borderRadius: number,
     font: string
   ) {
-    const defaultItems = [
-      {
-        image: `https://picsum.photos/seed/1/800/600?grayscale`,
-        text: 'Bridge'
-      },
-      {
-        image: `https://picsum.photos/seed/2/800/600?grayscale`,
-        text: 'Desk Setup'
-      },
-      {
-        image: `https://picsum.photos/seed/3/800/600?grayscale`,
-        text: 'Waterfall'
-      },
-      {
-        image: `https://picsum.photos/seed/4/800/600?grayscale`,
-        text: 'Strawberries'
-      },
-      {
-        image: `https://picsum.photos/seed/5/800/600?grayscale`,
-        text: 'Deep Diving'
-      },
-      {
-        image: `https://picsum.photos/seed/16/800/600?grayscale`,
-        text: 'Train Track'
-      },
-      {
-        image: `https://picsum.photos/seed/17/800/600?grayscale`,
-        text: 'Santorini'
-      },
-      {
-        image: `https://picsum.photos/seed/8/800/600?grayscale`,
-        text: 'Blurry Lights'
-      },
-      {
-        image: `https://picsum.photos/seed/9/800/600?grayscale`,
-        text: 'New York'
-      },
-      {
-        image: `https://picsum.photos/seed/10/800/600?grayscale`,
-        text: 'Good Boy'
-      },
-      {
-        image: `https://picsum.photos/seed/21/800/600?grayscale`,
-        text: 'Coastline'
-      },
-      {
-        image: `https://picsum.photos/seed/12/800/600?grayscale`,
-        text: 'Palm Trees'
-      }
-    ];
+    const defaultItems = imgsData.defaultItems
     const galleryItems = items && items.length ? items : defaultItems;
+    
     this.mediasImages = galleryItems.concat(galleryItems);
     this.medias = this.mediasImages.map((data, index) => {
       return new Media({
@@ -550,7 +539,8 @@ class App {
         bend,
         textColor,
         borderRadius,
-        font
+        font,
+        app: this
       });
     });
   }
@@ -558,7 +548,10 @@ class App {
   onTouchDown(e: MouseEvent | TouchEvent) {
     this.isDown = true;
     this.scroll.position = this.scroll.current;
-    this.start = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    this.start = x;
+    this.clickStart = { x, y };
   }
 
   onTouchMove(e: MouseEvent | TouchEvent) {
@@ -568,14 +561,43 @@ class App {
     this.scroll.target = (this.scroll.position ?? 0) + distance;
   }
 
-  onTouchUp() {
+  onTouchUp(e: MouseEvent | TouchEvent) {
+    if (!this.isDown) return;
     this.isDown = false;
+    
+    const x = 'changedTouches' in e ? e.changedTouches[0].clientX : (e as MouseEvent).clientX;
+    const y = 'changedTouches' in e ? e.changedTouches[0].clientY : (e as MouseEvent).clientY;
+    const dist = Math.hypot(x - this.clickStart.x, y - this.clickStart.y);
+    
+    if (dist < 5) {
+      this.handleClick(x, y);
+    }
+    
     this.onCheck();
+  }
+
+  handleClick(x: number, y: number) {
+    const rect = this.container.getBoundingClientRect();
+    const mouse: [number, number] = [
+      ((x - rect.left) / this.screen.width) * 2 - 1,
+      -((y - rect.top) / this.screen.height) * 2 + 1
+    ];
+
+    this.raycast.castMouse(this.camera, mouse);
+    const intersects = this.raycast.intersectMeshes(this.medias.map(m => m.plane));
+
+    if (intersects.length > 0) {
+      const clickedPlane = intersects[0];
+      const clickedMedia = this.medias.find(m => m.plane === clickedPlane);
+      if (clickedMedia && this.onSelect) {
+        this.onSelect({ image: clickedMedia.image, text: clickedMedia.text });
+      }
+    }
   }
 
   onWheel(e: Event) {
     const wheelEvent = e as WheelEvent;
-    const delta = wheelEvent.deltaY || (wheelEvent as WheelEvent & { wheelDelta: number }).wheelDelta || (wheelEvent as WheelEvent & { detail: number }).detail;
+    const delta = wheelEvent.deltaY || (wheelEvent as any).wheelDelta || (wheelEvent as any).detail;
     this.scroll.target += (delta > 0 ? this.scrollSpeed : -this.scrollSpeed) * 0.2;
     this.onCheckDebounce();
   }
@@ -645,6 +667,13 @@ class App {
     window.removeEventListener('touchstart', this.boundOnTouchDown);
     window.removeEventListener('touchmove', this.boundOnTouchMove);
     window.removeEventListener('touchend', this.boundOnTouchUp);
+
+    // Explicitly delete textures to free WebGL memory
+    this.textureCache.forEach(entry => {
+      this.gl.deleteTexture(entry.texture);
+    });
+    this.textureCache.clear();
+
     if (this.renderer && this.renderer.gl && this.renderer.gl.canvas.parentNode) {
       this.renderer.gl.canvas.parentNode.removeChild(this.renderer.gl.canvas as HTMLCanvasElement);
     }
@@ -671,6 +700,8 @@ export default function CircularGallery({
   scrollEase = 0.05
 }: CircularGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedItem, setSelectedItem] = useState<{ image: string; text: string } | null>(null);
+
   useEffect(() => {
     if (!containerRef.current) return;
     const app = new App(containerRef.current, {
@@ -680,11 +711,28 @@ export default function CircularGallery({
       borderRadius,
       font,
       scrollSpeed,
-      scrollEase
+      scrollEase,
+      onSelect: (item) => setSelectedItem(item)
     });
     return () => {
       app.destroy();
     };
   }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
-  return <div className="w-full h-full overflow-hidden cursor-grab active:cursor-grabbing" ref={containerRef} />;
+
+  return (
+    <div className="w-full h-full overflow-hidden cursor-grab active:cursor-grabbing" ref={containerRef}>
+      <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <DialogContent className="sm:max-w-4xl border-none bg-black/90 p-2 shadow-none flex items-center justify-center backdrop-blur-md outline-none">
+          <DialogTitle className="sr-only">{selectedItem?.text || 'Gallery Image'}</DialogTitle>
+          {selectedItem && (
+            <img 
+              src={selectedItem.image} 
+              alt={selectedItem.text} 
+              className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl transition-transform duration-300 ease-out"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }

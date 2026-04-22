@@ -69,9 +69,9 @@ export default function Home() {
             {/* Right: Hero Image */}
             <div className="relative h-96 md:h-full min-h-96 rounded-lg overflow-hidden shadow-2xl">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663404165549/g2PERz93dS2dzhGYUi7bTo/hero-bg-WWz3JyB88vZPmtXsZT3cLU.webp"
+                src= "/DisplayPhotos/1.jpeg"  //"https://d2xsxph8kpxj0f.cloudfront.net/310519663404165549/g2PERz93dS2dzhGYUi7bTo/hero-bg-WWz3JyB88vZPmtXsZT3cLU.webp"
                 alt="Hero Background"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-right object-cover"
               />
               <div className="absolute inset-0 bg-linear-to-t from-navy-900/20 to-transparent"></div>
             </div>
@@ -184,7 +184,7 @@ export default function Home() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 px-4 bg-white">
+      <section id="contact" className="pt-20 px-4 bg-white">
         <div className="container mx-auto max-w-4xl">
 
           <ScrollReveal className="text-center mb-12">
