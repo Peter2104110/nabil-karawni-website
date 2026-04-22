@@ -201,7 +201,7 @@ export default function Home() {
               <a href="https://wa.me/03888703" target="_blank" rel="noopener noreferrer">
                 <Phone className="w-8 h-8 text-gold mx-auto mb-4" />
                 <h3 className="font-bold text-navy-900 mb-2">Phone</h3>
-                <p className="text-gray-600">+971 522 695 759 <br />Click to Contact on WhatsApp</p>
+                <p className="text-gray-600">+961 03 888 703<br />Click to Contact on WhatsApp</p>
               </a>
             </div>
 
